@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 
 # Virtual environments
-.venv/
+.venv*/
 venv/
 env/
 ENV/
@@ -29,3 +29,7 @@ htmlcov/
 Thumbs.db
 .vscode/
 .idea/
+
+
+
+PROJECT_REPORT.md
