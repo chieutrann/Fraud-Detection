@@ -141,14 +141,6 @@ This project is a strong baseline but is not yet a production fraud-detection sy
 4. Some transaction, identity, or timing fields may be unstable over time or require additional leakage checks.
 5. Historical IEEE-CIS data may not represent current fraud patterns.
 
-## 8. Recommendations
-
-1. Add a majority-class baseline for comparison.
-2. Evaluate multiple chronological validation windows.
-3. Review time, identity, and identifier-like fields for leakage and generalization risk.
-4. Select the operating threshold using fraud losses, investigation costs, and review capacity rather than F1 alone.
-5. Add feature-importance, explainability, probability-calibration, and drift-monitoring analyses.
-
 ## 9. Conclusion
 
 This project establishes a practical baseline for fraud detection using the IEEE-CIS dataset. It combines missing-data treatment, categorical encoding, class-imbalance adjustments, chronological evaluation, and model-specific threshold selection. In the executed comparison, XGBoost performed best on validation data with an F1 score of 0.529 at a threshold of 0.85. On the untouched test period, it achieved ROC-AUC of 0.882, average precision of 0.446, precision of 56.32%, recall of 38.24%, and F1 score of 0.456.
