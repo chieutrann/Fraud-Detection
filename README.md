@@ -80,7 +80,7 @@ This procedure recognizes that a 0.50 threshold is not automatically appropriate
 
 A confusion matrix is also created for the model with the highest validation F1 score. It shows true negatives, false positives, false negatives, and true positives.
 
-![Confusion Matrix](charts/Matrix.png)
+![Confusion Matrix](charts/matrix.png)
 
 ## 6. Results
 
