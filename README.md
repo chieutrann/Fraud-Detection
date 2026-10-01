@@ -9,13 +9,13 @@ Fraud detection is a critical challenge for industries such as e-commerce and ba
 
 ### Removing incomplete variables
 
-The percentage of missing values is calculated for every column. Variables with at least 50% missing values are removed. This reduces the influence of fields that contain too little information.
+The percentage of missing values is calculated for every column in the training period. Variables with at least 50% missing values in training are removed from all splits. This reduces the influence of fields that contain too little information without using future-period information to make the feature-selection decision.
 ### Handling missing values
 
 The remaining variables are separated into categorical and continuous features:
 
 - Missing categorical values are replaced with `Missing`.
-- Missing continuous values are replaced with the median of each column.
+- Missing continuous values are replaced with the median calculated from the training period.
 
 
 ### Encoding categorical variables
@@ -45,15 +45,15 @@ The fraud class is less frequent than the legitimate class. To reduce the risk t
 
 ## 4. Models
 
-### Model Selection
+### Models Evaluated
 
 Three machine-learning models were evaluated: Logistic Regression, Random Forest, and XGBoost. Model performance was assessed using ROC-AUC, average precision, precision, recall, and F1 score.
 
-The ROC curve below is generated using validation data. It compares each model's ability to rank fraudulent transactions above legitimate transactions across classification thresholds.
+The ROC curves below are generated using validation data. They compare each model's ability to rank fraudulent transactions above legitimate transactions across classification thresholds.
 
 ![ROC curve comparison](charts/roc_curves.png)
 
-The ROC curve shows the relationship between the true-positive rate and false-positive rate across classification thresholds. Curves that remain farther above the random-classifier diagonal and closer to the top-left corner indicate better ranking performance.
+The ROC curves show the relationship between the true-positive rate and false-positive rate across classification thresholds. Curves that remain farther above the random-classifier diagonal and closer to the top-left corner indicate better ranking performance.
 
 
 
@@ -84,7 +84,7 @@ A confusion matrix is also created for the model with the highest validation F1 
 
 ## 6. Results
 
-The executed notebook contains 590,540 transactions in total. The chronological split produced the following summary:
+The dataset contains 590,540 transactions in total. After training-only column selection, imputation, and one-hot encoding, each split contained 284 features.
 
 | Split | Transactions | Fraud rate | Fraud count |
 |---|---:|---:|---:|
@@ -92,7 +92,7 @@ The executed notebook contains 590,540 transactions in total. The chronological 
 | Validation | 118,108 | 3.90% | 4,611 |
 | Test | 118,108 | 3.44% | 4,064 |
 
-After one-hot encoding, each split contained 309 features.
+
 
 ### Validation results
 
@@ -100,9 +100,9 @@ The best threshold for each model was selected by validation F1 score:
 
 | Model | Threshold | Precision | Recall | F1 score | Transactions flagged |
 |---|---:|---:|---:|---:|---:|
-| XGBoost | 0.85 | 65.14% | 44.50% | 0.529 | 3,150 |
-| Random Forest | 0.70 | 43.44% | 46.56% | 0.449 | 4,943 |
-| Logistic Regression | 0.60 | 19.65% | 40.75% | 0.265 | 9,561 |
+| XGBoost | 0.80 | 56.10% | 50.10% | 0.529 | 4,118 |
+| Random Forest | 0.70 | 43.02% | 46.37% | 0.446 | 4,970 |
+| Logistic Regression | 0.60 | 19.89% | 34.66% | 0.253 | 8,035 |
 
 XGBoost achieved the strongest validation F1 score of 0.529 and was selected as the best validation model.
 
@@ -112,24 +112,24 @@ Using the XGBoost threshold selected on validation data, the final test performa
 
 | Metric | Test result |
 |---|---:|
-| Threshold | 0.85 |
-| ROC-AUC | 0.882 |
-| Average precision | 0.446 |
-| Precision | 56.32% |
-| Recall | 38.24% |
-| F1 score | 0.456 |
-| Transactions flagged | 2,759 |
+| Threshold | 0.80 |
+| ROC-AUC | 0.879 |
+| Average Precision | 0.451 |
+| Precision | 46.83% |
+| Recall | 43.36% |
+| F1 score | 0.45 |
+| Transactions flagged | 3,762 |
 
 ### Confusion matrix
 
 |  | Predicted legitimate | Predicted fraud |
 |---|---:|---:|
-| Actual legitimate | 112,839 | 1,205 |
-| Actual fraud | 2,510 | 1,554 |
+| Actual legitimate | 112,044 | 2,000 |
+| Actual fraud | 2,302 | 1,762 |
 
-The test results show strong ranking performance, with ROC-AUC of 0.882. However, the selected high-precision threshold detected 1,554 of 4,064 fraudulent transactions and missed 2,510. A lower threshold could improve recall if detecting more fraud is more important than limiting false positives.
+The test results show strong ranking performance, with ROC-AUC of 0.879. At the selected threshold of 0.80, XGBoost detected 1,762 of 4,064 fraudulent transactions and missed 2,302. It also produced 2,000 false positives, flagging 3,762 transactions in total. A lower threshold could improve recall if detecting more fraud is more important than limiting false positives.
 
-The test average precision of 0.446 is substantially higher than the test fraud prevalence of 3.44%. This indicates that XGBoost ranks fraudulent transactions considerably better than a random classifier, although the selected threshold still leaves many fraudulent transactions undetected.
+The test average precision was 0.451, substantially higher than the test fraud prevalence of 3.44%. This indicates that XGBoost ranks fraudulent transactions considerably better than a random classifier, although the selected threshold still leaves many fraudulent transactions undetected.
 
 ## 7. Limitations
 
@@ -140,7 +140,7 @@ This project is a strong baseline but is not yet a production fraud-detection sy
 3. One-hot encoding high-cardinality fields can create a large and sparse feature matrix.
 4. Some transaction, identity, or timing fields may be unstable over time or require additional leakage checks.
 5. Historical IEEE-CIS data may not represent current fraud patterns.
+   
+## 8. Conclusion
 
-## 9. Conclusion
-
-This project establishes a practical baseline for fraud detection using the IEEE-CIS dataset. It combines missing-data treatment, categorical encoding, class-imbalance adjustments, chronological evaluation, and model-specific threshold selection. In the executed comparison, XGBoost performed best on validation data with an F1 score of 0.529 at a threshold of 0.85. On the untouched test period, it achieved ROC-AUC of 0.882, average precision of 0.446, precision of 56.32%, recall of 38.24%, and F1 score of 0.456.
+This project establishes a practical baseline for fraud detection using the IEEE-CIS dataset. It combines missing-data treatment, categorical encoding, class-imbalance adjustments, chronological evaluation, and model-specific threshold selection. In the current comparison, XGBoost performed best on validation data with an F1 score of 0.529 at a threshold of 0.80. On the test period, it achieved ROC-AUC of 0.879, average precision of 0.451, precision of 46.83%, recall of 43.36%, and F1 score of approximately 0.45.
